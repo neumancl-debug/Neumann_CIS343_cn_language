@@ -1,42 +1,46 @@
 import sys
 
-class cn:
-    @staticmethod
-    def main():
-        args = sys.argv[1:]
+def main():
+    # Receive the arguements from the command line
+    args = sys.argv[1:]
 
-        if len(args)> 1:
-            print("Usage: cn [script]")
-            sys.exit(64)
+    # Exit if more than one argument is given
+    if len(args)> 1:
+        print("Usage: cn [script]")
+        sys.exit(64)
 
-        elif len(args) == 1:
-            run_file(args[0])
+    # Run the file if exactly one argument is given
+    elif len(args) == 1:
+        run_file(args[0])
 
-        else:
-            run_prompt()
+    # Run REPL if no arguments are given
+    else:
+        run_repl()
 
 
+# Run the given file
 def run_file(path):
     with open(path, 'r') as file:
         source = file.read()
-    run(source)
+    run_source(source)
 
-
-def run_prompt():
+# Starts REPL and takes input until EOF or CTRL+C
+def run_repl():
     while True:
         try:
             line = input("> ")
-        except EOFError:
+        except (EOFError, KeyboardInterrupt):
             break
-        run(line)
+        run_source(line)
 
-            
-def run(source):
+# Wll eventually run the scanner     
+def run_source(source):
     print(source)
-    print("Scanner not implemented")
+    print("Scanner Not Implemented")
 
-def Scanner(source):
+def scanner(source):
+    #Scanner function will be implemeted in the future
     pass
 
 if __name__ == "__main__":
-    cn.main()
+    main()
