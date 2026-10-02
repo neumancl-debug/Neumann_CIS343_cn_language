@@ -1,0 +1,21 @@
+#* this is a block Comment
+
+it can have multiple lines*#
+
+"This is a string token"
+
+#* this is a block Comment
+
+    #* with nested comments on the inside
+
+        #* another nested comment*#
+
+    *#
+
+*#
+
+"This is a string after the nested comment"
+
+#* So #* Many #* Levels #* ! *# *# *# *#
+
+#*#* unterminated test #**#

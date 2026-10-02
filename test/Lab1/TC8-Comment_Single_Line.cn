@@ -1,0 +1,4 @@
+# hello this is a Comment
+# No tokens should be created from this Comment
+# Only a single "hello" token should appear
+"hello"

@@ -1,0 +1,16 @@
+test unexpected characters ^ ? ~ $ ` & ' : [ ] \
+
+"Another test of
+
+unterminated 
+
+strings
+
+on 
+
+multiple
+
+lines
+
+
+

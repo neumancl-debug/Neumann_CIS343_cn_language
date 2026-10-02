@@ -1,0 +1,14 @@
+""
+"hello
+world
+multi line"
+"ZZZzzz"
+"123"
+"1.0"
+".0"
+"String with    TABS    in      it...."
+"string with keywords for modulo plus minus else if var"
+"Test Special Chars $ % ^ &* * ( ) [ ] { } ! @"
+"123 + 987"
+"Other < Sybmols ? / \ | ~"
+"Test Unterminated String

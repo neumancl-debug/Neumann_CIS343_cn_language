@@ -1,0 +1,10 @@
+variable_name
+_var
+helloworld
+__123
+ABC_123_zzz
+
+123abc
+variable-name
+invalid.name
+*not^an:identifier

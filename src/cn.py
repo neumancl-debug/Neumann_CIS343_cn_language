@@ -1,4 +1,7 @@
+# Entry point for the CN programming language interpreter, integrates the scanner and error handling
 import sys
+from error_handling import ErrorHandler
+from cn_scanner import Scanner
 
 def main():
     # Receive the arguements from the command line
@@ -22,25 +25,30 @@ def main():
 def run_file(path):
     with open(path, 'r') as file:
         source = file.read()
+    
     run_source(source)
+
+    return 65 if ErrorHandler.has_error else 0
 
 # Starts REPL and takes input until EOF or CTRL+C
 def run_repl():
     while True:
         try:
             line = input("> ")
-        except (EOFError, KeyboardInterrupt):
+        except EOFError:
+            print("\nEOF received. Exiting REPL.")
+            break
+        except KeyboardInterrupt:
+            print("\nKeyboardInterrupt. Exiting REPL.")
             break
         run_source(line)
 
-# Wll eventually run the scanner     
+# Runs the source code through the scanner and prints the resulting tokens
 def run_source(source):
-    print(source)
-    print("Scanner Not Implemented")
+    ErrorHandler.has_error = False
 
-def scanner(source):
-    #Scanner function will be implemeted in the future
-    pass
+    for token in Scanner(source).scan_tokens():
+       print(token)
 
 if __name__ == "__main__":
     main()
