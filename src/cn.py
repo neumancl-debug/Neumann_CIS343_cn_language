@@ -2,6 +2,8 @@
 import sys
 from error_handling import ErrorHandler
 from cn_scanner import Scanner
+from parser import Parser
+from AST_Printer import ASTPrinter
 
 def main():
     # Receive the arguements from the command line
@@ -47,8 +49,14 @@ def run_repl():
 def run_source(source):
     ErrorHandler.has_error = False
 
-    for token in Scanner(source).scan_tokens():
-       print(token)
+    tokens = Scanner(source).scan_tokens()
+    parser = Parser(tokens)
+    expression = parser.parse()
+
+    if ErrorHandler.has_error:
+        return
+
+    print(ASTPrinter().print(expression))
 
 if __name__ == "__main__":
     main()
