@@ -1,9 +1,10 @@
 # Entry point for the CN programming language interpreter, integrates the scanner and error handling
 import sys
+
+from cn_evaluator import Interpreter
 from error_handling import ErrorHandler
 from cn_scanner import Scanner
-from parser import Parser
-from AST_Printer import ASTPrinter
+from cn_parser import Parser
 
 def main():
     # Receive the arguements from the command line
@@ -51,12 +52,13 @@ def run_source(source):
 
     tokens = Scanner(source).scan_tokens()
     parser = Parser(tokens)
-    expression = parser.parse()
+    statements = parser.parse()
 
     if ErrorHandler.has_error:
         return
 
-    print(ASTPrinter().print(expression))
+    interpreter = Interpreter()
+    interpreter.interpret(statements)
 
 if __name__ == "__main__":
     main()

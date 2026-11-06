@@ -1,6 +1,6 @@
 from error_handling import ErrorHandler
 from token_type import TokenType
-from expression_grammar import Binary, Literal, Grouping, Unary
+from expression_grammar import Binary, Literal, Grouping, Unary, Expression, Print
 
 class ParseError(Exception):
     pass
@@ -80,8 +80,6 @@ class Parser:
         expr = self.factor()
 
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            operator = self.previous()
-
         
             operator = self.previous()
             right = self.factor()
@@ -168,16 +166,30 @@ class Parser:
 
             self.advance()
 
+    # Parses the list of tokens and returns a list of statements (AST nodes).
     def parse(self):
-        try:
-            expression = self.expression()
-            if not self.is_at_end():
-                if self.check(TokenType.RIGHT_PAREN):
-                    raise self.error(self.peek(), "Unexpected ')' after expression.")
+        statements = []
+        while not self.is_at_end():
+            try:
+                statements.append(self.statement())
+            except ParseError:
+                self.synchronize()
+        return statements
 
-                raise self.error(self.peek(), "Unexpected token after expression.")
+    # Parses a single statement, which can be either a print statement or an expression statement.
+    def statement(self):
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+        return self.expression_statement()
 
-            return expression
+    # Parses a print statement, which consists of the 'print' keyword followed by an expression and a semicolon.
+    def print_statement(self):
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Print(value)
 
-        except ParseError:
-            return None
+    # Parses an expression statement, which consists of an expression followed by a semicolon.
+    def expression_statement(self):
+        expr = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Expression(expr)
