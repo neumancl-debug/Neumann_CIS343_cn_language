@@ -1,9 +1,14 @@
-from expression_grammar import Binary, Unary, Literal, Grouping, Expression, Print
+from expression_grammar import Binary, Unary, Literal, Grouping, Expression, Print, Var, Variable, Assign, Block
 from token_type import TokenType
 from error_handling import RuntimeError, ErrorHandler
+from Environment import Environment
 
 # Interpreter class for evaluating expressions and executing statements.
 class Interpreter:
+    
+    # Initializes the interpreter with a global environment for variable storage.
+    def __init__(self):
+        self.environment = Environment()
 
     # Evaluates an expression and returns its value.
     def visit_literal_expr(self, expr):
@@ -144,3 +149,34 @@ class Interpreter:
     def visit_print_stmt(self, stmt):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
+
+    # Visits a variable declaration statement, evaluates the initializer (if present), and defines the variable in the current environment.
+    def visit_var_stmt(self, stmt):
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+        self.environment.define(stmt.name.lexeme, value)
+
+    # Visits a variable expression, retrieves its value from the current environment, and returns it.
+    def visit_variable_expr(self, expr):
+        return self.environment.get(expr.name)
+
+    # Visits an assignment expression, evaluates the value, assigns it to the variable in the current environment, and returns the value.
+    def visit_assign_expr(self, expr):
+        value = self.evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+    # Visits a block statement, creates a new environment for the block, and executes the statements in the block within that environment.
+    def visit_block_stmt(self, stmt):
+        self.execute_block(stmt.statements, Environment(self.environment))
+
+    # Executes a block of statements within a given environment, temporarily replacing the current environment with the new one.
+    def execute_block(self, statements, environment):
+        previous = self.environment
+        try:
+            self.environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.environment = previous

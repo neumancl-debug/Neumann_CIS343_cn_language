@@ -1,0 +1,11 @@
+var x = "hello";
+var y = "goodbye";
+{
+    var x = "right";
+    var y = "left";
+
+    print x;
+    print y;
+}
+print x;
+print y;

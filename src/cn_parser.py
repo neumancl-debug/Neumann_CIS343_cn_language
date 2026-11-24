@@ -1,6 +1,6 @@
 from error_handling import ErrorHandler
 from token_type import TokenType
-from expression_grammar import Binary, Literal, Grouping, Unary, Expression, Print
+from expression_grammar import Binary, Literal, Grouping, Unary, Expression, Print, Var, Variable, Assign, Block
 
 class ParseError(Exception):
     pass
@@ -14,7 +14,7 @@ class Parser:
 
     # Parses the list of tokens and returns the resulting expression tree
     def expression(self):
-        return self.equality()
+        return self.assignment()
     
     # Parse equality expressions (== and !=)
     def equality(self):
@@ -119,6 +119,10 @@ class Parser:
         if self.match(TokenType.NUMBER, TokenType.STRING):
             return Literal(self.previous().literal)
 
+        # Parse variable expressions (identifiers)
+        if self.match(TokenType.IDENTIFIER):
+            return Variable(self.previous())
+
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
@@ -141,7 +145,7 @@ class Parser:
 
     # Handles parsing errors by reporting them and returning a ParseError instance
     def error(self, token, message):
-        ErrorHandler.error(token, message)
+        self.error_handling.error(token, message)
         return ParseError()
 
     # Synchronizes the parser after encountering an error to continue parsing subsequent statements.
@@ -171,7 +175,7 @@ class Parser:
         statements = []
         while not self.is_at_end():
             try:
-                statements.append(self.statement())
+                statements.append(self.declaration())
             except ParseError:
                 self.synchronize()
         return statements
@@ -180,6 +184,9 @@ class Parser:
     def statement(self):
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.LEFT_BRACE):
+            return Block(self.block())
+        
         return self.expression_statement()
 
     # Parses a print statement, which consists of the 'print' keyword followed by an expression and a semicolon.
@@ -193,3 +200,45 @@ class Parser:
         expr = self.expression()
         self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Expression(expr)
+
+    # Parses a variable declaration statement, which consists of the 'var' keyword, an identifier, an optional initializer, and a semicolon.
+    def declaration(self):
+        if self.match(TokenType.VAR):
+            return self.var_declaration()
+        return self.statement()
+
+    # Parses a variable declaration statement, which consists of the 'var' keyword, an identifier, an optional initializer, and a semicolon.
+    def var_declaration(self):
+        name = self.consume(TokenType.IDENTIFIER, "Expect variable name.")
+        initializer = None
+
+        if self.match(TokenType.EQUAL):
+            initializer = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+
+        return Var(name, initializer)
+
+    # Parses an assignment expression, which consists of an identifier, an equal sign, and an expression
+    def assignment(self):
+        expr = self.equality()
+
+        if self.match(TokenType.EQUAL):
+            equals = self.previous()
+            value = self.assignment()
+
+            if isinstance(expr, Variable):
+                return Assign(expr.name, value)
+
+            # If the left-hand side of the assignment is not a variable, raise an error indicating that the assignment target is invalid.
+            raise self.error(equals, "Invalid assignment target.")
+
+        return expr
+
+    # Parses a block of statements enclosed in braces, returning a list of statements.
+    def block(self):
+        statements = []
+
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            statements.append(self.declaration())
+        self.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements

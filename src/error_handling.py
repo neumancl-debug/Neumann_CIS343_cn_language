@@ -19,15 +19,17 @@ class ErrorHandler:
         print(f"[line {line}] Error{where}: {message}")
         ErrorHandler.has_error = True
 
+    # Reports a runtime error with the line number and location.
+    @staticmethod
+    def runtime_error(error):
+        print(f"[line {error.token.line}] Runtime Error: {error.message}")
+        ErrorHandler.has_error = True
+
 # RuntimeError class for handling runtime errors during interpretation.
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
         self.token = token
+        self.message = message
 
-    # Reports a runtime error with the line number and location.
-    @staticmethod
-    def runtime_error(error):
-        print(f"{error}\n[line {error.token.line}]")
-        ErrorHandler.has_error = True
     

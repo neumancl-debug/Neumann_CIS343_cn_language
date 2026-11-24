@@ -1,0 +1,18 @@
+var x = 30;
+{
+    var y = 40;
+    print x;
+    print y;
+    {
+        var z = 50;
+        print x;
+        print y;
+        print z;
+    }
+    print x;
+    print y;
+    print z;
+}
+print x;
+print y;
+print z;
